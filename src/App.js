@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import produce from "immer";
-
+import matrix from './matrix.jpg'
 const numRows = 25;
 const numCols = 25;
 
@@ -30,16 +30,15 @@ const App: React.FC = () => {
   });
 
   const [running, setRunning] = useState(false);
-
+  const [speed, setSpeed] = useState(1000);
   const runningRef = useRef(running);
   runningRef.current = running;
 
   const runSimulation = useCallback(() => {
     if (!runningRef.current) {
       return;
-    }
-
-    setGrid(g => {
+    } 
+    setGrid((g,speed) => {
       return produce(g, gridCopy => {
         for (let i = 0; i < numRows; i++) {
           for (let k = 0; k < numCols; k++) {
@@ -62,20 +61,25 @@ const App: React.FC = () => {
       });
     });
 
-    setTimeout(runSimulation, 500);
+    setTimeout(runSimulation, speed);
   }, []);
-
+  useEffect(() => { 
+    runSimulation()
+  },[speed])
     return (
-      <div>
+      <div style={{backgroundImage:`url(${matrix})`, backgroundSize: 'cover',
+      marginTop: '-200px', height:'1300px'}}>
+        
         
         <div
           style={{
             marginLeft: '600px',
-            marginTop: '200px',
+            paddingTop: '400px',
             display: "grid",
             gridTemplateColumns: `repeat(${numCols}, 20px)`
           }}
         >
+  
           {grid.map((rows, i) =>
             rows.map((col, k) => (
               <div
@@ -129,7 +133,14 @@ const App: React.FC = () => {
         >
           clear
         </button>
+        <button onClick={() => {setSpeed(speed -500)}}>
+          inc speed
+        </button>
+       
         </div>
+        <h2 style={{color: 'lime', paddingTop: '25px',margin: 'auto', height: '200px', width: '400px', zIndex: '99'}}>
+          Welcome to the Game of Life
+        </h2>
       </div>
     );
   };
